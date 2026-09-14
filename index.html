@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>MIND-Grasp</title>
+
+  <!-- Browser tab icon / favicon. Use a square, tightly-cropped logo image. -->
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png" />
+  <link rel="icon" type="image/png" sizes="64x64" href="assets/logo.png" />
+  <link rel="icon" type="image/png" sizes="128x128" href="assets/logo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png" />
+
+  <style>
+    :root {
+      --purple: #6a35d8;
+      --purple-dark: #4e22b8;
+      --purple-soft: #efe8ff;
+      --purple-faint: rgba(106, 53, 216, 0.075);
+      --text: #23232a;
+      --muted: #626271;
+      --subtle: #8b8796;
+      --line: #e3e0ea;
+      --card: rgba(255, 255, 255, 0.90);
+      --inner: rgba(255, 255, 255, 0.74);
+      --shadow: 0 28px 80px rgba(88, 74, 135, 0.18);
+      --soft-shadow: 0 16px 42px rgba(28, 23, 47, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 32% 12%, rgba(121, 73, 232, 0.13), transparent 28%),
+        radial-gradient(circle at 78% 26%, rgba(144, 99, 255, 0.08), transparent 26%),
+        linear-gradient(180deg, #fbfbfe 0%, #f7f6fb 48%, #ffffff 100%);
+      line-height: 1.62;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page-shell {
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Left navigation */
+    .side-nav {
+      position: fixed;
+      left: 26px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+      width: 250px;
+      padding: 10px 0;
+    }
+
+    .nav-group {
+      position: relative;
+      padding: 4px 0 8px;
+    }
+
+    .nav-group::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 27px;
+      bottom: 6px;
+      width: 2px;
+      background: #ddd9e7;
+      z-index: -1;
+    }
+
+    .nav-main,
+    .nav-sub {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      transition: color 0.2s ease;
+    }
+
+    .nav-main {
+      padding: 8px 0;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 1.45px;
+      text-transform: uppercase;
+      color: #3f3d48;
+      white-space: nowrap;
+    }
+
+    .nav-sub {
+      margin-left: 35px;
+      padding: 4px 0;
+      max-width: 205px;
+      font-size: 10.5px;
+      line-height: 1.25;
+      color: #777382;
+    }
+
+    .nav-main:hover,
+    .nav-sub:hover {
+      color: var(--purple-dark);
+    }
+
+    .nav-dot {
+      width: 21px;
+      height: 21px;
+      border-radius: 999px;
+      border: 2px solid #ddd9e7;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      transition: all 0.2s ease;
+    }
+
+    .nav-dot::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: transparent;
+      transition: background 0.2s ease;
+    }
+
+    .nav-main.active {
+      color: var(--purple-dark);
+    }
+
+    .nav-main.active .nav-dot {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 7px rgba(106, 53, 216, 0.12);
+    }
+
+    .nav-main.active .nav-dot::after {
+      background: var(--purple);
+    }
+
+    .nav-sub.active {
+      color: var(--purple-dark);
+      font-weight: 760;
+    }
+
+    /* Page card */
+    .main-card {
+      width: min(1120px, calc(100% - 340px));
+      margin: 58px 60px 90px 280px;
+      padding: 72px 56px 74px;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 0 8px 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .logo {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(52px, 6vw, 82px);
+      line-height: 1.02;
+      font-weight: 850;
+      letter-spacing: -2.8px;
+      color: var(--purple);
+    }
+
+    .subtitle {
+      font-size: 32px;
+      font-weight: 500;
+      color: #3f3f46;
+      line-height: 1.32;
+      margin: 0 auto 22px;
+      max-width: 1180px;
+      text-align: center;
+      letter-spacing: -0.4px;
+    }
+
+    .subtitle-line {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .purple {
+      color: var(--purple);
+      font-weight: 750;
+    }
+
+    .anonymous-note {
+      display: inline-block;
+      margin: 4px auto 18px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(106, 53, 216, 0.08);
+      color: var(--purple-dark);
+      font-size: 15px;
+      font-weight: 750;
+      letter-spacing: 0.2px;
+    }
+
+    .teaser-block {
+      scroll-margin-top: 42px;
+      margin: 0 auto 22px;
+      max-width: 1040px;
+    }
+
+    .teaser-img {
+      width: 100%;
+      display: block;
+      margin: 0 auto 10px;
+      border-radius: 18px;
+      background: #f7f7fb;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .teaser-motion-lines {
+      position: relative;
+      height: 30px;
+      margin: 0 auto 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      opacity: 0.92;
+    }
+
+    .teaser-motion-lines::before,
+    .teaser-motion-lines::after,
+    .moving-line {
+      content: "";
+      position: absolute;
+      left: 50%;
+      width: min(760px, 82%);
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(106, 53, 216, 0.16) 16%,
+        rgba(106, 53, 216, 0.76) 50%,
+        rgba(106, 53, 216, 0.16) 84%,
+        transparent 100%);
+      filter: drop-shadow(0 0 8px rgba(106, 53, 216, 0.20));
+      animation: lineFlow 3.6s ease-in-out infinite;
+    }
+
+    .teaser-motion-lines::before {
+      top: 7px;
+      transform: translateX(-50%);
+      animation-delay: -0.8s;
+    }
+
+    .moving-line {
+      top: 14px;
+      transform: translateX(-50%) scaleX(0.88);
+      opacity: 0.70;
+      animation-delay: -1.7s;
+    }
+
+    .teaser-motion-lines::after {
+      top: 21px;
+      transform: translateX(-50%) scaleX(0.72);
+      opacity: 0.48;
+      animation-delay: -2.4s;
+    }
+
+    @keyframes lineFlow {
+      0% {
+        background-position: -260px 0;
+        opacity: 0.36;
+        filter: drop-shadow(0 0 3px rgba(106, 53, 216, 0.10));
+      }
+      45% {
+        opacity: 0.96;
+        filter: drop-shadow(0 0 10px rgba(106, 53, 216, 0.24));
+      }
+      100% {
+        background-position: 260px 0;
+        opacity: 0.42;
+        filter: drop-shadow(0 0 3px rgba(106, 53, 216, 0.10));
+      }
+    }
+
+    .teaser-caption {
+      margin: 0 auto;
+      padding: 18px 22px;
+      max-width: 980px;
+      border: 1px solid rgba(106, 53, 216, 0.15);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(250, 248, 255, 0.76));
+      box-shadow: 0 12px 32px rgba(58, 45, 100, 0.08);
+      text-align: left;
+    }
+
+    .teaser-caption h3 {
+      margin: 0 0 7px;
+      font-size: 18px;
+      line-height: 1.28;
+      color: #282832;
+    }
+
+    .teaser-caption p {
+      margin: 0;
+      color: #4d4b57;
+      font-size: 15px;
+      line-height: 1.68;
+      text-align: justify;
+    }
+
+    .section {
+      scroll-margin-top: 42px;
+      padding-top: 28px;
+      margin-top: 34px;
+    }
+
+    .introduction-section {
+      padding-top: 0;
+      margin-top: 8px;
+    }
+
+    .section-title {
+      margin: 0 0 18px;
+      font-size: 32px;
+      line-height: 1.22;
+      letter-spacing: -0.8px;
+    }
+
+    .subsection {
+      scroll-margin-top: 42px;
+      margin-top: 24px;
+      padding-top: 10px;
+    }
+
+    .subsection-title {
+      margin: 0 0 12px;
+      font-size: 24px;
+      line-height: 1.26;
+      letter-spacing: -0.45px;
+    }
+
+    .figure-img {
+      width: 100%;
+      display: block;
+      margin: 14px auto 14px;
+      border-radius: 16px;
+      background: #f7f7fb;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .caption-card,
+    .analysis-card,
+    .future-card {
+      padding: 18px 20px;
+      border: 1px solid rgba(106, 53, 216, 0.16);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(250, 248, 255, 0.76));
+      box-shadow: 0 12px 32px rgba(58, 45, 100, 0.08);
+    }
+
+    .caption-card h3,
+    .analysis-card h3,
+    .future-card h3 {
+      margin: 0 0 7px;
+      font-size: 17px;
+      line-height: 1.28;
+      color: #282832;
+    }
+
+    .caption-card p,
+    .analysis-card p,
+    .future-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.62;
+    }
+
+    .placeholder,
+    .video-placeholder {
+      min-height: 300px;
+      border: 1.5px dashed rgba(106, 53, 216, 0.30);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(106, 53, 216, 0.07), rgba(255, 255, 255, 0.80)),
+        repeating-linear-gradient(45deg, rgba(106, 53, 216, 0.025), rgba(106, 53, 216, 0.025) 10px, transparent 10px, transparent 20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8a7aaa;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-align: center;
+      padding: 22px;
+      margin: 14px 0;
+    }
+
+    .video-placeholder {
+      min-height: 360px;
+    }
+
+    .analysis-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .results-interactive {
+      margin: 14px auto 16px;
+      padding: 18px 18px 20px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.54);
+      border: 1px solid rgba(106, 53, 216, 0.10);
+      box-shadow: 0 14px 38px rgba(68, 57, 102, 0.08);
+      overflow-x: auto;
+    }
+
+    .scene-selector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      margin: 0 auto 22px;
+      flex-wrap: wrap;
+    }
+
+    .scene-tab {
+      position: relative;
+      width: 180px;
+      height: 112px;
+      padding: 0;
+      border: 2px solid transparent;
+      border-radius: 15px;
+      background: #ffffff;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(28, 23, 47, 0.12);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .scene-tab:hover {
+      transform: translateY(-2px);
+      border-color: rgba(106, 53, 216, 0.45);
+      box-shadow: 0 14px 30px rgba(75, 44, 154, 0.18);
+    }
+
+    .scene-tab.active {
+      border-color: var(--purple);
+      box-shadow:
+        0 0 0 5px rgba(106, 53, 216, 0.13),
+        0 16px 36px rgba(75, 44, 154, 0.22);
+    }
+
+    .scene-tab img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      background: #f6f5fa;
+    }
+
+    .scene-tab span {
+      position: absolute;
+      right: 8px;
+      bottom: 7px;
+      min-width: 34px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      color: #ffffff;
+      background: rgba(36, 32, 52, 0.78);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1px;
+    }
+
+    .results-stage-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(260px, 1fr));
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .result-stage-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(36, 32, 52, 0.08);
+      box-shadow: 0 12px 30px rgba(28, 23, 47, 0.08);
+    }
+
+    .result-stage-card h4 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      line-height: 1.25;
+      letter-spacing: -0.25px;
+      color: #282832;
+    }
+
+    .interactive-placeholder {
+      min-height: 300px;
+      border: 1.5px dashed rgba(106, 53, 216, 0.30);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(106, 53, 216, 0.06), rgba(255, 255, 255, 0.82)),
+        repeating-linear-gradient(45deg, rgba(106, 53, 216, 0.022), rgba(106, 53, 216, 0.022) 10px, transparent 10px, transparent 20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 18px;
+      color: #8a7aaa;
+    }
+
+    .interactive-placeholder strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--purple-dark);
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .interactive-placeholder span {
+      display: block;
+      max-width: 210px;
+      margin: 0 auto;
+      font-size: 13.5px;
+      line-height: 1.48;
+    }
+
+    .video-slot {
+      background:
+        linear-gradient(135deg, rgba(28, 23, 47, 0.06), rgba(255, 255, 255, 0.82)),
+        repeating-linear-gradient(45deg, rgba(28, 23, 47, 0.025), rgba(28, 23, 47, 0.025) 10px, transparent 10px, transparent 20px);
+    }
+
+    .stage-hint {
+      margin: 10px 0 0;
+      color: #77727f;
+      font-size: 13px;
+      line-height: 1.4;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .scene-stage-content {
+      display: none;
+      width: 100%;
+    }
+
+    .scene-stage-content.active {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .scene-stage-content .interactive-placeholder {
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .result-stage-card.is-retreat h4 {
+      text-align: center;
+    }
+
+    .result-stage-card.is-retreat .interactive-placeholder {
+      justify-content: center;
+      align-items: center;
+    }
+
+    .viewer-embed,
+    .result-video,
+    .analysis-video {
+      width: 100%;
+      aspect-ratio: 1600 / 1300;
+      height: auto;
+      display: block;
+      border: 0;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: inset 0 0 0 1px rgba(36, 32, 52, 0.08);
+      object-fit: contain;
+    }
+
+    .demo-video {
+      width: 100%;
+      max-width: 1920px;
+      aspect-ratio: 16 / 9;
+      height: auto;
+      display: block;
+      margin: 14px auto;
+      border: 0;
+      border-radius: 18px;
+      background: #000000;
+      box-shadow: var(--soft-shadow);
+      object-fit: contain;
+    }
+
+    .grasp-execution-video-frame {
+      position: relative;
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .grasp-execution-speed-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(36, 32, 52, 0.78);
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 850;
+      line-height: 1;
+      letter-spacing: 0.1px;
+      backdrop-filter: blur(8px);
+      z-index: 2;
+    }
+
+
+
+    .analysis-interactive {
+      margin: 14px auto 16px;
+      padding: 18px 18px 20px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.54);
+      border: 1px solid rgba(106, 53, 216, 0.10);
+      box-shadow: 0 14px 38px rgba(68, 57, 102, 0.08);
+      overflow-x: auto;
+    }
+
+    .analysis-case-selector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin: 0 auto 22px;
+      flex-wrap: wrap;
+    }
+
+    .analysis-case-tab {
+      position: relative;
+      width: 132px;
+      height: 84px;
+      padding: 0;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      background: #ffffff;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(28, 23, 47, 0.12);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .analysis-case-tab:hover {
+      transform: translateY(-2px);
+      border-color: rgba(106, 53, 216, 0.45);
+      box-shadow: 0 14px 30px rgba(75, 44, 154, 0.18);
+    }
+
+    .analysis-case-tab.active {
+      border-color: var(--purple);
+      box-shadow:
+        0 0 0 5px rgba(106, 53, 216, 0.13),
+        0 16px 36px rgba(75, 44, 154, 0.22);
+    }
+
+    .analysis-case-tab img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      background: #f6f5fa;
+    }
+
+    .analysis-case-tab span {
+      position: absolute;
+      right: 7px;
+      bottom: 6px;
+      min-width: 28px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      color: #ffffff;
+      background: rgba(36, 32, 52, 0.78);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1px;
+    }
+
+    .analysis-stage-grid {
+      display: grid;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .analysis-stage-grid.two-column {
+      grid-template-columns: repeat(2, minmax(320px, 1fr));
+    }
+
+    .analysis-stage-grid.three-column {
+      grid-template-columns: repeat(3, minmax(260px, 1fr));
+    }
+
+    .analysis-stage-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(36, 32, 52, 0.08);
+      box-shadow: 0 12px 30px rgba(28, 23, 47, 0.08);
+    }
+
+    .analysis-stage-card h4 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      line-height: 1.25;
+      letter-spacing: -0.25px;
+      color: #282832;
+      text-align: center;
+    }
+
+    .analysis-stage-content {
+      display: none;
+      width: 100%;
+    }
+
+    .analysis-stage-content.active {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .analysis-placeholder {
+      width: 100%;
+      min-height: 300px;
+      border: 1.5px dashed rgba(106, 53, 216, 0.30);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(106, 53, 216, 0.06), rgba(255, 255, 255, 0.82)),
+        repeating-linear-gradient(45deg, rgba(106, 53, 216, 0.022), rgba(106, 53, 216, 0.022) 10px, transparent 10px, transparent 20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 18px;
+      color: #8a7aaa;
+    }
+
+    .analysis-placeholder strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--purple-dark);
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .analysis-placeholder span {
+      display: block;
+      max-width: 250px;
+      margin: 0 auto;
+      font-size: 13.5px;
+      line-height: 1.48;
+    }
+
+    .analysis-viewer-embed {
+      width: 100%;
+      min-height: 300px;
+      display: block;
+      border: 0;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: inset 0 0 0 1px rgba(36, 32, 52, 0.08);
+    }
+
+
+    .image-slot {
+      width: 100%;
+      min-height: 300px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 0 1px rgba(36, 32, 52, 0.08);
+    }
+
+    .image-slot img {
+      width: 100%;
+      height: 100%;
+      min-height: 300px;
+      display: block;
+      object-fit: contain;
+      background: #ffffff;
+    }
+
+    .video-image-slot,
+    .future-image-slot {
+      min-height: 360px;
+    }
+
+    .video-image-slot img,
+    .future-image-slot img {
+      min-height: 360px;
+    }
+
+    .static-analysis-image {
+      margin: 14px 0;
+      box-shadow: var(--soft-shadow);
+    }
+
+
+    .real-world-demo-wrap {
+      margin: 14px auto 16px;
+      padding: 12px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.54);
+      border: 1px solid rgba(106, 53, 216, 0.10);
+      box-shadow: 0 14px 38px rgba(68, 57, 102, 0.08);
+      overflow: hidden;
+    }
+
+    .real-world-demo-slider {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: calc((100% - 36px) / 4);
+      gap: 12px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding: 0;
+      padding: 0 0 14px;
+      scrollbar-color: rgba(106, 53, 216, 0.52) rgba(106, 53, 216, 0.10);
+      scrollbar-width: thin;
+    }
+
+    .real-world-demo-slider::-webkit-scrollbar {
+      height: 10px;
+    }
+
+    .real-world-demo-slider::-webkit-scrollbar-track {
+      border-radius: 999px;
+      background: rgba(106, 53, 216, 0.10);
+    }
+
+    .real-world-demo-slider::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(106, 53, 216, 0.54);
+    }
+
+    .real-world-demo-card {
+      margin: 0;
+      min-width: 0;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 12px 30px rgba(28, 23, 47, 0.08);
+      scroll-snap-align: start;
+    }
+
+    .real-world-video-frame {
+      position: relative;
+      width: 100%;
+      border-radius: 18px 18px 0 0;
+      overflow: hidden;
+      background: #ffffff;
+      line-height: 0;
+    }
+
+    .real-world-demo-card video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      height: auto;
+      display: block;
+      margin: 0;
+      border: 0;
+      border-radius: 18px 18px 0 0;
+      background: #ffffff;
+      object-fit: contain;
+      vertical-align: top;
+    }
+
+    .real-world-speed-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(36, 32, 52, 0.78);
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 850;
+      line-height: 1;
+      letter-spacing: 0.1px;
+      backdrop-filter: blur(8px);
+    }
+
+    .real-world-demo-label {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      min-width: 28px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(36, 32, 52, 0.76);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1px;
+    }
+
+    .real-world-demo-instruction {
+      min-height: 34px;
+      margin: -1px 0 0;
+      padding: 5px 8px 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4c4858;
+      font-size: 12.5px;
+      line-height: 1.16;
+      text-align: center;
+      font-style: italic;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 248, 255, 0.90));
+      border-top: 1px solid rgba(106, 53, 216, 0.08);
+    }
+
+    .real-world-slider-hint {
+      margin: 4px 0 0;
+      color: #77727f;
+      font-size: 13px;
+      line-height: 1.45;
+      text-align: center;
+      font-style: italic;
+    }
+
+
+
+    .future-subsection {
+      scroll-margin-top: 42px;
+      margin-top: 22px;
+    }
+
+    .future-subtitle {
+      margin: 0 0 14px;
+      font-size: 24px;
+      line-height: 1.26;
+      letter-spacing: -0.45px;
+      text-align: center;
+    }
+
+    .failure-slider-wrap {
+      margin: 14px auto 18px;
+      padding: 10px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.54);
+      border: 1px solid rgba(106, 53, 216, 0.10);
+      box-shadow: 0 14px 38px rgba(68, 57, 102, 0.08);
+      overflow: hidden;
+    }
+
+    .failure-slider {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: calc((100% - 20px) / 3);
+      gap: 10px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding: 0;
+      padding: 0 0 14px;
+      scrollbar-color: rgba(106, 53, 216, 0.52) rgba(106, 53, 216, 0.10);
+      scrollbar-width: thin;
+    }
+
+    .failure-slider::-webkit-scrollbar {
+      height: 10px;
+    }
+
+    .failure-slider::-webkit-scrollbar-track {
+      border-radius: 999px;
+      background: rgba(106, 53, 216, 0.10);
+    }
+
+    .failure-slider::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(106, 53, 216, 0.54);
+    }
+
+    .failure-case-card {
+      position: relative;
+      margin: 0;
+      min-height: 292px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 12px 30px rgba(28, 23, 47, 0.08);
+      scroll-snap-align: start;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .failure-case-card img {
+      width: 100%;
+      height: 100%;
+      min-height: 292px;
+      display: block;
+      object-fit: contain;
+      background: #f7f7fb;
+    }
+
+    .failure-case-label {
+      position: absolute;
+      left: 12px;
+      bottom: 30px;
+      min-width: 38px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(36, 32, 52, 0.76);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .failure-slider-hint {
+      margin: 4px 0 0;
+      color: #77727f;
+      font-size: 13px;
+      line-height: 1.45;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .footer-note {
+      margin-top: 56px;
+      padding-top: 26px;
+      border-top: 1px solid var(--line);
+      color: #77727f;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    @media (max-width: 1260px) {
+      .side-nav {
+        display: none;
+      }
+
+      .main-card {
+        width: min(1040px, calc(100% - 32px));
+        margin: 32px auto 90px;
+        padding: 54px 34px 58px;
+      }
+
+      .results-stage-grid {
+        grid-template-columns: repeat(3, minmax(240px, 1fr));
+        gap: 14px;
+      }
+
+      .result-stage-card {
+        padding: 14px;
+      }
+
+      .interactive-placeholder {
+        min-height: 280px;
+      }
+
+      .image-slot,
+      .image-slot img {
+        min-height: 280px;
+      }
+
+      .analysis-stage-grid.two-column {
+        grid-template-columns: repeat(2, minmax(300px, 1fr));
+      }
+
+      .analysis-stage-grid.three-column {
+        grid-template-columns: repeat(3, minmax(240px, 1fr));
+      }
+
+      .analysis-stage-card {
+        padding: 14px;
+      }
+
+      .analysis-placeholder {
+        min-height: 280px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .main-card {
+        width: calc(100% - 20px);
+        margin: 10px auto 36px;
+        padding: 38px 18px 44px;
+        border-radius: 22px;
+      }
+
+      .brand {
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .logo {
+        width: 60px;
+        height: 60px;
+      }
+
+      .title {
+        font-size: 42px;
+        letter-spacing: -1.6px;
+      }
+
+      .subtitle {
+        font-size: 22px;
+        line-height: 1.35;
+      }
+
+      .subtitle-line {
+        white-space: normal;
+      }
+
+      .anonymous-note {
+        font-size: 13px;
+      }
+
+      .teaser-caption {
+        padding: 18px 16px;
+      }
+
+      .teaser-caption h3 {
+        font-size: 17px;
+      }
+
+      .teaser-caption p {
+        font-size: 14.5px;
+      }
+
+      .section-title {
+        font-size: 27px;
+      }
+
+      .subsection-title {
+        font-size: 22px;
+      }
+
+      .caption-card p,
+      .analysis-card p,
+      .future-card p {
+        font-size: 14px;
+      }
+
+      .placeholder,
+      .video-placeholder {
+        min-height: 220px;
+      }
+
+      .results-interactive {
+        padding: 14px;
+      }
+
+      .scene-tab {
+        width: 142px;
+        height: 90px;
+      }
+
+      .results-stage-grid {
+        grid-template-columns: repeat(3, minmax(230px, 1fr));
+        gap: 12px;
+        min-width: 740px;
+      }
+
+      .result-stage-card {
+        padding: 12px;
+      }
+
+      .result-stage-card h4 {
+        font-size: 16px;
+      }
+
+      .interactive-placeholder {
+        min-height: 220px;
+      }
+
+
+      .failure-slider-wrap {
+        padding: 8px;
+      }
+
+      .failure-slider {
+        grid-auto-columns: calc((100% - 18px) / 3);
+        gap: 9px;
+        min-width: 820px;
+      }
+
+      .real-world-demo-slider {
+        grid-auto-columns: calc((100% - 36px) / 4);
+        gap: 12px;
+        min-width: 980px;
+      }
+
+      .failure-case-card {
+        min-height: 250px;
+      }
+
+      .failure-case-card img {
+        height: 100%;
+        min-height: 250px;
+        object-fit: contain;
+      }
+
+      .image-slot,
+      .image-slot img {
+        min-height: 220px;
+      }
+
+      .analysis-interactive {
+        padding: 14px;
+      }
+
+      .analysis-case-tab {
+        width: 116px;
+        height: 74px;
+      }
+
+      .analysis-stage-grid.two-column {
+        grid-template-columns: repeat(2, minmax(260px, 1fr));
+        min-width: 560px;
+      }
+
+      .analysis-stage-grid.three-column {
+        grid-template-columns: repeat(3, minmax(230px, 1fr));
+        min-width: 740px;
+      }
+
+      .analysis-stage-card {
+        padding: 12px;
+      }
+
+      .analysis-stage-card h4 {
+        font-size: 16px;
+      }
+
+      .analysis-placeholder {
+        min-height: 220px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page-shell">
+    <nav class="side-nav" aria-label="Section navigation">
+      <div class="nav-group">
+        <a class="nav-main active" href="#introduction-overview" data-group="introduction">
+          <span class="nav-dot"></span><span>Introduction</span>
+        </a>
+        <a class="nav-sub active" href="#introduction-overview" data-group="introduction" data-target="introduction-overview">Overview</a>
+        <a class="nav-sub" href="#introduction-video" data-group="introduction" data-target="introduction-video">Video</a>
+      </div>
+
+      <div class="nav-group">
+        <a class="nav-main" href="#method-reconstruction" data-group="method">
+          <span class="nav-dot"></span><span>Method</span>
+        </a>
+        <a class="nav-sub" href="#method-reconstruction" data-group="method" data-target="method-reconstruction">Occluded Scene Reconstruction</a>
+        <a class="nav-sub" href="#method-retraction" data-group="method" data-target="method-retraction">Retraction-Aware Grasp Selection</a>
+      </div>
+
+      <div class="nav-group">
+        <a class="nav-main" href="#results-visual" data-group="results">
+          <span class="nav-dot"></span><span>Results</span>
+        </a>
+        <a class="nav-sub" href="#results-visual" data-group="results" data-target="results-visual">Visualization of MIND-Grasp</a>
+        <a class="nav-sub" href="#results-full" data-group="results" data-target="results-full">Full-Occlusion Discovery</a>
+        <a class="nav-sub" href="#results-real-world" data-group="results" data-target="results-real-world">Real-World Demo</a>
+      </div>
+
+      <div class="nav-group">
+        <a class="nav-main" href="#analysis-reconstruction" data-group="analysis">
+          <span class="nav-dot"></span><span>Analysis</span>
+        </a>
+        <a class="nav-sub" href="#analysis-reconstruction" data-group="analysis" data-target="analysis-reconstruction">Multi-View Reconstruction</a>
+        <a class="nav-sub" href="#analysis-nbv" data-group="analysis" data-target="analysis-nbv">NBV Trajectories</a>
+        <a class="nav-sub" href="#analysis-retraction" data-group="analysis" data-target="analysis-retraction">Retraction Success</a>
+        <a class="nav-sub" href="#analysis-discovery" data-group="analysis" data-target="analysis-discovery">Discovery-to-Grasp</a>
+      </div>
+
+      <div class="nav-group">
+        <a class="nav-main" href="#future-failure" data-group="future">
+          <span class="nav-dot"></span><span>Future Work</span>
+        </a>
+        <a class="nav-sub" href="#future-failure" data-group="future" data-target="future-failure">Failure Cases</a>
+        <a class="nav-sub" href="#future-limitations" data-group="future" data-target="future-limitations">Limitations and Extensions</a>
+      </div>
+    </nav>
+
+    <main class="main-card">
+      <header class="hero" id="top">
+        <div class="brand">
+          <img class="logo" src="assets/logo.png" alt="MIND-Grasp logo" />
+          <h1 class="title">MIND-Grasp</h1>
+        </div>
+
+        <div class="subtitle">
+          <span class="subtitle-line">
+            <span class="purple">M</span>ultiview
+            <span class="purple">I</span>magination-guided
+            <span class="purple">N</span>ext-best-action
+            <span class="purple">D</span>iscovery
+          </span>
+          <span class="subtitle-line">
+            for Occlusion-Aware Grasping
+          </span>
+        </div>
+
+        <div class="anonymous-note">Anonymous Submission for CoRL 2026</div>
+
+        <article class="teaser-block" id="introduction-overview" data-group="introduction">
+          <img class="teaser-img" src="assets/teaser.png" alt="MIND-Grasp teaser overview" />
+          <div class="teaser-motion-lines" aria-hidden="true">
+            <span class="moving-line"></span>
+          </div>
+          <div class="teaser-caption">
+            <h3>Overview</h3>
+            <p>
+              MIND-Grasp combines amodal target imagination, occlusion-cloud-guided multiview discovery, and retraction-aware grasp selection to retrieve targets under partial, full, and self-occlusion in cluttered scenes.
+            </p>
+          </div>
+        </article>
+      </header>
+
+      <section class="section introduction-section" id="introduction">
+        <article class="subsection" id="introduction-video" data-group="introduction">
+          <h3 class="subsection-title">Video</h3>
+          <video class="demo-video" controls playsinline preload="metadata" src="assets/video.mp4" title="Video" data-manual-playback="true">
+            Your browser does not support the video tag.
+          </video>
+        </article>
+      </section>
+
+      <section class="section" id="method">
+        <h2 class="section-title">Method</h2>
+
+        <article class="subsection" id="method-reconstruction" data-group="method">
+          <h3 class="subsection-title">Occluded Scene Reconstruction</h3>
+          <img class="figure-img" src="assets/overview.png" alt="Occluded scene reconstruction overview" />
+          <div class="caption-card">
+            <h3>Amodal Imagination and Observable-Corridor Discovery</h3>
+            <p>
+              MIND-Grasp imagines amodal 3D target geometry under partial and full occlusion, then builds a target-centric occlusion cloud to guide closed-loop multiview discovery through observable corridors.
+            </p>
+          </div>
+        </article>
+
+        <article class="subsection" id="method-retraction" data-group="method">
+          <h3 class="subsection-title">Retraction-Aware Grasp Selection</h3>
+          <img class="figure-img" src="assets/grasp.png" alt="Retraction-aware grasp selection" />
+          <div class="caption-card">
+            <h3>Object-Level Retreat and Collision Checking</h3>
+            <p>
+              MIND-Grasp plans an object-level retreat trajectory and selects a grasp whose gripper-target composite body can safely follow it; otherwise, the dominant blocking object is removed and the retreat plan is updated.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="section" id="results">
+        <h2 class="section-title">Results</h2>
+
+        <article class="subsection" id="results-visual" data-group="results">
+          <h3 class="subsection-title">Visualization of MIND-Grasp</h3>
+
+          <div class="results-interactive">
+            <div class="scene-selector" aria-label="Select an initial-view scene">
+              <button class="scene-tab active" type="button" data-scene="scene-1">
+                <img src="assets/results/results_scene1_initial.png" alt="Initial view of scene 1" />
+                <span>Scene 1</span>
+              </button>
+              <button class="scene-tab" type="button" data-scene="scene-2">
+                <img src="assets/results/results_scene2_initial.png" alt="Initial view of scene 2" />
+                <span>Scene 2</span>
+              </button>
+            </div>
+
+            <div class="results-stage-grid">
+              <div class="result-stage-card" data-stage="nbv">
+                <h4>Next-Best-View</h4>
+                <div class="scene-stage-content active" data-scene="scene-1">
+                  <video class="result-video" playsinline muted loop preload="auto" src="assets/results/scene1/nbv.mp4" title="Scene 1 Next-Best-View result" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Scene 1 NBV example replacement:
+                  <iframe class="viewer-embed" src="assets/results/scene1/nbv_viewer.html" title="Scene 1 Next-Best-View 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="scene-stage-content" data-scene="scene-2">
+                  <video class="result-video" playsinline muted loop preload="auto" src="assets/results/scene2/nbv.mp4" title="Scene 2 Next-Best-View result" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Scene 2 NBV example replacement:
+                  <iframe class="viewer-embed" src="assets/results/scene2/nbv_viewer.html" title="Scene 2 Next-Best-View 3D viewer"></iframe>
+                  -->
+                </div>
+              </div>
+
+              <div class="result-stage-card is-retreat" data-stage="retreat">
+                <h4>Retreat Trajectory</h4>
+                <div class="scene-stage-content active" data-scene="scene-1">
+                  <video class="result-video" playsinline muted loop preload="auto" src="assets/results/scene1/retreat_trajectory.mp4" title="Scene 1 retreat trajectory result" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Scene 1 retreat example replacement:
+                  <iframe class="viewer-embed" src="assets/results/scene1/retreat_viewer.html" title="Scene 1 retreat trajectory 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="scene-stage-content" data-scene="scene-2">
+                  <video class="result-video" playsinline muted loop preload="auto" src="assets/results/scene2/retreat_trajectory.mp4" title="Scene 2 retreat trajectory result" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Scene 2 retreat example replacement:
+                  <iframe class="viewer-embed" src="assets/results/scene2/retreat_viewer.html" title="Scene 2 retreat trajectory 3D viewer"></iframe>
+                  -->
+                </div>
+              </div>
+
+              <div class="result-stage-card" data-stage="video">
+                <h4>Grasp Execution</h4>
+                <div class="scene-stage-content active" data-scene="scene-1">
+                  <div class="grasp-execution-video-frame">
+                    <video class="result-video grasp-execution-video" playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/scene1/grasp_execution.mp4" title="Scene 1 grasp execution" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                    <span class="grasp-execution-speed-badge">Speed up x3</span>
+                  </div>
+                  <!-- Scene 1 video example replacement:
+                  <video class="result-video grasp-execution-video" playsinline muted src="assets/results/scene1/grasp_execution.mp4" preload="auto" data-playback-rate="3" autoplay loop webkit-playsinline defaultMuted></video>
+                  -->
+                </div>
+                <div class="scene-stage-content" data-scene="scene-2">
+                  <div class="grasp-execution-video-frame">
+                    <video class="result-video grasp-execution-video" playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/scene2/grasp_execution.mp4" title="Scene 2 grasp execution" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                    <span class="grasp-execution-speed-badge">Speed up x3</span>
+                  </div>
+                  <!-- Scene 2 video example replacement:
+                  <video class="result-video grasp-execution-video" playsinline muted src="assets/results/scene2/grasp_execution.mp4" preload="auto" data-playback-rate="3" autoplay loop webkit-playsinline defaultMuted></video>
+                  -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="caption-card">
+            <h3>NBV Discovery and Retreat</h3>
+            <p>
+              MIND-Grasp performs observable-corridor-guided NBV discovery, plans a safe gripper-target retreat trajectory, and executes the final grasp in cluttered occluded scenes.
+            </p>
+          </div>
+        </article>
+
+        <article class="subsection" id="results-full" data-group="results">
+          <h3 class="subsection-title">Full-Occlusion Discovery</h3>
+          <img class="figure-img" src="assets/results/full_occluded.png" alt="Full-occlusion discovery" />
+          <div class="caption-card">
+            <h3>From Hidden Target to Executable Grasp</h3>
+            <p>
+              For fully occluded targets, MIND-Grasp removes the occluder, updates the amodal 3D model through discovery, and finally grasps the exposed target.
+            </p>
+          </div>
+        </article>
+
+
+        <article class="subsection" id="results-real-world" data-group="results">
+          <h3 class="subsection-title">Real-World Demo</h3>
+          <div class="real-world-demo-wrap">
+            <div class="real-world-demo-slider" aria-label="Real-world robot demo video slider">
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo1.mp4" title="Real-world demo 1: Grasp the Starbucks bottle" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Grasp the Starbucks bottle”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo2.mp4" title="Real-world demo 2: Grasp the cat toy" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Grasp the cat toy”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo3.mp4" title="Real-world demo 3: Find the hidden colorful toy" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Find the hidden colorful toy”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo4.mp4" title="Real-world demo 4: Find the hidden medicine bottle" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Find the hidden medicine bottle”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo5.mp4" title="Real-world demo 5: Grasp the colorful toy" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Grasp the colorful toy”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo6.mp4" title="Real-world demo 6: Grasp the medicine bottle" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Grasp the medicine bottle”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo7.mp4" title="Real-world demo 7: Find the glue bottle" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Find the glue bottle”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo8.mp4" title="Real-world demo 8: Find the hidden black toy" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Find the hidden black toy”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo9.mp4" title="Real-world demo 9: Take out the glue bottle" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Take out the glue bottle”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo10.mp4" title="Real-world demo 10: Get me the brush" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Get me the brush”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo11.mp4" title="Real-world demo 11: Hand me the tennis ball" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Hand me the tennis ball”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo12.mp4" title="Real-world demo 12: Find the red block" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Find the red block”</figcaption>
+              </figure>
+              <figure class="real-world-demo-card">
+                <div class="real-world-video-frame">
+                  <video playsinline muted loop preload="auto" data-playback-rate="3" src="assets/results/real_world_demos/demo13.mp4" title="Real-world demo 13: Get me the chewing gum" autoplay webkit-playsinline defaultMuted onloadedmetadata="this.playbackRate=3" onplay="this.playbackRate=3">Your browser does not support the video tag.</video>
+                </div>
+                <figcaption class="real-world-demo-instruction">“Get me the chewing gum”</figcaption>
+              </figure>
+            </div>
+            <p class="real-world-slider-hint">Slide horizontally to view real-world demos（Speed up x3）.</p>
+          </div>
+          <div class="caption-card">
+            <h3>Real-Robot Occluded Grasping Demos</h3>
+            <p>
+              Real-world robot demos show MIND-Grasp performing occlusion-aware discovery, retraction-aware grasping, and target retrieval in cluttered tabletop scenes.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="section" id="analysis">
+        <h2 class="section-title">Analysis</h2>
+
+        <div class="analysis-list">
+          <article class="subsection" id="analysis-reconstruction" data-group="analysis">
+            <h3 class="subsection-title">Multi-View Reconstruction Refinement</h3>
+
+            <div class="analysis-interactive" data-analysis-group="reconstruction">
+              <div class="analysis-case-selector" aria-label="Select an initial-view case for reconstruction analysis">
+              <button class="analysis-case-tab active" type="button" data-analysis-group="reconstruction" data-case="case-1">
+                <img src="assets/analysis/case1/initial_view.png" alt="Initial view of analysis case 1" />
+                <span>1</span>
+              </button>
+              <button class="analysis-case-tab" type="button" data-analysis-group="reconstruction" data-case="case-2">
+                <img src="assets/analysis/case2/initial_view.png" alt="Initial view of analysis case 2" />
+                <span>2</span>
+              </button>
+              <button class="analysis-case-tab" type="button" data-analysis-group="reconstruction" data-case="case-3">
+                <img src="assets/analysis/case3/initial_view.png" alt="Initial view of analysis case 3" />
+                <span>3</span>
+              </button>
+              <button class="analysis-case-tab" type="button" data-analysis-group="reconstruction" data-case="case-4">
+                <img src="assets/analysis/case4/initial_view.png" alt="Initial view of analysis case 4" />
+                <span>4</span>
+              </button>
+              <button class="analysis-case-tab" type="button" data-analysis-group="reconstruction" data-case="case-5">
+                <img src="assets/analysis/case5/initial_view.png" alt="Initial view of analysis case 5" />
+                <span>5</span>
+              </button>
+              </div>
+
+              <div class="analysis-stage-grid two-column">
+                <div class="analysis-stage-card">
+                  <h4>Single-View Reconstruction</h4>
+                <div class="analysis-stage-content active" data-analysis-group="reconstruction" data-case="case-1">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case1/single_view.mp4" title="Case 1 single-view reconstruction" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 1 Single-View Reconstruction 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case1/single_view_viewer.html" title="Case 1 Single-View Reconstruction 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="reconstruction" data-case="case-2">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case2/single_view.mp4" title="Case 2 single-view reconstruction" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 2 Single-View Reconstruction 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case2/single_view_viewer.html" title="Case 2 Single-View Reconstruction 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="reconstruction" data-case="case-3">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case3/single_view.mp4" title="Case 3 single-view reconstruction" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 3 Single-View Reconstruction 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case3/single_view_viewer.html" title="Case 3 Single-View Reconstruction 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="reconstruction" data-case="case-4">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case4/single_view.mp4" title="Case 4 single-view reconstruction" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 4 Single-View Reconstruction 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case4/single_view_viewer.html" title="Case 4 Single-View Reconstruction 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="reconstruction" data-case="case-5">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case5/single_view.mp4" title="Case 5 single-view reconstruction" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 5 Single-View Reconstruction 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case5/single_view_viewer.html" title="Case 5 Single-View Reconstruction 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                </div>
+
+                <div class="analysis-stage-card">
+                  <h4>Multi-View Refinement</h4>
+                <div class="analysis-stage-content active" data-analysis-group="reconstruction" data-case="case-1">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case1/multi_view_refinement.mp4" title="Case 1 multi-view refinement" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 1 Multi-View Refinement 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case1/multi_view_viewer.html" title="Case 1 Multi-View Refinement 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="reconstruction" data-case="case-2">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case2/multi_view_refinement.mp4" title="Case 2 multi-view refinement" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 2 Multi-View Refinement 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case2/multi_view_viewer.html" title="Case 2 Multi-View Refinement 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="reconstruction" data-case="case-3">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case3/multi_view_refinement.mp4" title="Case 3 multi-view refinement" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 3 Multi-View Refinement 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case3/multi_view_viewer.html" title="Case 3 Multi-View Refinement 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="reconstruction" data-case="case-4">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case4/multi_view_refinement.mp4" title="Case 4 multi-view refinement" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 4 Multi-View Refinement 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case4/multi_view_viewer.html" title="Case 4 Multi-View Refinement 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="reconstruction" data-case="case-5">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case5/multi_view_refinement.mp4" title="Case 5 multi-view refinement" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 5 Multi-View Refinement 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case5/multi_view_viewer.html" title="Case 5 Multi-View Refinement 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="analysis-card">
+              <h3>Severe-Occlusion Reconstruction</h3>
+              <p>
+                Single-view reconstruction can produce unreliable geometry and pose under heavy occlusion. MIND-Grasp uses occlusion-cloud-guided NBV planning and multiview updates to recover more complete, pose-consistent target models.
+              </p>
+            </div>
+          </article>
+
+          <article class="subsection" id="analysis-nbv" data-group="analysis">
+            <h3 class="subsection-title">NBV Trajectories</h3>
+
+            <div class="analysis-interactive" data-analysis-group="nbv">
+              <div class="analysis-case-selector" aria-label="Select an initial-view case for NBV trajectory analysis">
+              <button class="analysis-case-tab active" type="button" data-analysis-group="nbv" data-case="case-1">
+                <img src="assets/analysis/case1/initial_view.png" alt="Initial view of analysis case 1" />
+                <span>1</span>
+              </button>
+              <button class="analysis-case-tab" type="button" data-analysis-group="nbv" data-case="case-2">
+                <img src="assets/analysis/case2/initial_view.png" alt="Initial view of analysis case 2" />
+                <span>2</span>
+              </button>
+              <button class="analysis-case-tab" type="button" data-analysis-group="nbv" data-case="case-3">
+                <img src="assets/analysis/case3/initial_view.png" alt="Initial view of analysis case 3" />
+                <span>3</span>
+              </button>
+              <button class="analysis-case-tab" type="button" data-analysis-group="nbv" data-case="case-4">
+                <img src="assets/analysis/case4/initial_view.png" alt="Initial view of analysis case 4" />
+                <span>4</span>
+              </button>
+              <button class="analysis-case-tab" type="button" data-analysis-group="nbv" data-case="case-5">
+                <img src="assets/analysis/case5/initial_view.png" alt="Initial view of analysis case 5" />
+                <span>5</span>
+              </button>
+              </div>
+
+              <div class="analysis-stage-grid three-column">
+                <div class="analysis-stage-card">
+                  <h4>NGF</h4>
+                <div class="analysis-stage-content active" data-analysis-group="nbv" data-case="case-1">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case1/ngf_trajectory.mp4" title="Case 1 NGF trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 1 NGF Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case1/ngf_viewer.html" title="Case 1 NGF Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-2">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case2/ngf_trajectory.mp4" title="Case 2 NGF trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 2 NGF Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case2/ngf_viewer.html" title="Case 2 NGF Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-3">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case3/ngf_trajectory.mp4" title="Case 3 NGF trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 3 NGF Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case3/ngf_viewer.html" title="Case 3 NGF Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-4">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case4/ngf_trajectory.mp4" title="Case 4 NGF trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 4 NGF Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case4/ngf_viewer.html" title="Case 4 NGF Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-5">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case5/ngf_trajectory.mp4" title="Case 5 NGF trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 5 NGF Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case5/ngf_viewer.html" title="Case 5 NGF Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                </div>
+
+                <div class="analysis-stage-card">
+                  <h4>VISO-Grasp</h4>
+                <div class="analysis-stage-content active" data-analysis-group="nbv" data-case="case-1">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case1/viso_grasp_trajectory.mp4" title="Case 1 VISO-Grasp trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 1 VISO-Grasp Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case1/viso_viewer.html" title="Case 1 VISO-Grasp Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-2">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case2/viso_grasp_trajectory.mp4" title="Case 2 VISO-Grasp trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 2 VISO-Grasp Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case2/viso_viewer.html" title="Case 2 VISO-Grasp Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-3">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case3/viso_grasp_trajectory.mp4" title="Case 3 VISO-Grasp trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 3 VISO-Grasp Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case3/viso_viewer.html" title="Case 3 VISO-Grasp Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-4">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case4/viso_grasp_trajectory.mp4" title="Case 4 VISO-Grasp trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 4 VISO-Grasp Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case4/viso_viewer.html" title="Case 4 VISO-Grasp Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-5">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case5/viso_grasp_trajectory.mp4" title="Case 5 VISO-Grasp trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 5 VISO-Grasp Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case5/viso_viewer.html" title="Case 5 VISO-Grasp Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                </div>
+
+                <div class="analysis-stage-card">
+                  <h4>MIND-Grasp</h4>
+                <div class="analysis-stage-content active" data-analysis-group="nbv" data-case="case-1">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case1/mind_grasp_trajectory.mp4" title="Case 1 MIND-Grasp trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 1 MIND-Grasp Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case1/mind_grasp_viewer.html" title="Case 1 MIND-Grasp Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-2">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case2/mind_grasp_trajectory.mp4" title="Case 2 MIND-Grasp trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 2 MIND-Grasp Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case2/mind_grasp_viewer.html" title="Case 2 MIND-Grasp Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-3">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case3/mind_grasp_trajectory.mp4" title="Case 3 MIND-Grasp trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 3 MIND-Grasp Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case3/mind_grasp_viewer.html" title="Case 3 MIND-Grasp Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-4">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case4/mind_grasp_trajectory.mp4" title="Case 4 MIND-Grasp trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 4 MIND-Grasp Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case4/mind_grasp_viewer.html" title="Case 4 MIND-Grasp Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                <div class="analysis-stage-content" data-analysis-group="nbv" data-case="case-5">
+                  <video class="analysis-video" playsinline muted loop preload="auto" src="assets/analysis/case5/mind_grasp_trajectory.mp4" title="Case 5 MIND-Grasp trajectory" autoplay webkit-playsinline defaultMuted>Your browser does not support the video tag.</video>
+                  <!-- Case 5 MIND-Grasp Trajectory 3D Viewer example replacement:
+                  <iframe class="analysis-viewer-embed" src="assets/analysis/case5/mind_grasp_viewer.html" title="Case 5 MIND-Grasp Trajectory 3D Viewer 3D viewer"></iframe>
+                  -->
+                </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="analysis-card">
+              <h3>Target-Centric View Planning</h3>
+              <p>
+                NGF often explores globally with longer redundant paths, while VISO-Grasp may resample similar viewpoints. MIND-Grasp focuses on target-centric occlusion clouds, yielding shorter paths with fewer target-critical views.
+              </p>
+            </div>
+          </article>
+
+          <article class="subsection" id="analysis-retraction" data-group="analysis">
+            <h3 class="subsection-title">Retraction Success Analysis</h3>
+            <div class="image-slot static-analysis-image">
+              <img src="assets/analysis/retraction_success.png" alt="Retraction success analysis" />
+            </div>
+            <div class="analysis-card">
+              <h3>Retraction Collision Check</h3>
+              <p>
+                The bar height reports collision-free retraction rate, with retained feasible grasps shown above each bar. MIND-Grasp improves retraction reliability through RCC-based composite-body retreat checking.
+              </p>
+            </div>
+          </article>
+
+          <article class="subsection" id="analysis-discovery" data-group="analysis">
+            <h3 class="subsection-title">Discovery-to-Grasp Process</h3>
+            <div class="image-slot static-analysis-image">
+              <img src="assets/analysis/discovery_to_grasp.png" alt="Discovery-to-grasp process" />
+            </div>
+            <div class="analysis-card">
+              <h3>Full-Occlusion Discovery</h3>
+              <p>
+                Starting from an invisible target, MIND-Grasp builds an imaginary amodal hypothesis, selects NBV discovery views from the target-centric occlusion cloud, updates target geometry, and performs retraction-aware grasping.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="future-work" data-group="future">
+        <h2 class="section-title">Future Work</h2>
+
+        <article class="future-subsection" id="future-failure" data-group="future">
+          <h3 class="future-subtitle">MIND-Grasp Failure Cases</h3>
+          <div class="failure-slider-wrap">
+            <div class="failure-slider" aria-label="MIND-Grasp failure case slider">
+              <figure class="failure-case-card">
+                <img src="assets/future/failure_case1.png" alt="MIND-Grasp failure case 1" />
+                <figcaption class="failure-case-label">(a)</figcaption>
+              </figure>
+              <figure class="failure-case-card">
+                <img src="assets/future/failure_case2.png" alt="MIND-Grasp failure case 2" />
+                <figcaption class="failure-case-label">(b)</figcaption>
+              </figure>
+              <figure class="failure-case-card">
+                <img src="assets/future/failure_case3.png" alt="MIND-Grasp failure case 3" />
+                <figcaption class="failure-case-label">(c)</figcaption>
+              </figure>
+              <figure class="failure-case-card">
+                <img src="assets/future/failure_case4.png" alt="MIND-Grasp failure case 4" />
+                <figcaption class="failure-case-label">(d)</figcaption>
+              </figure>
+              <figure class="failure-case-card">
+                <img src="assets/future/failure_case5.png" alt="MIND-Grasp failure case 5" />
+                <figcaption class="failure-case-label">(e)</figcaption>
+              </figure>
+              <figure class="failure-case-card">
+                <img src="assets/future/failure_case6.png" alt="MIND-Grasp failure case 6" />
+                <figcaption class="failure-case-label">(f)</figcaption>
+              </figure>
+            </div>
+            <p class="failure-slider-hint">Slide horizontally to view failure cases.</p>
+          </div>
+        </article>
+
+        <article class="future-subsection" id="future-limitations" data-group="future">
+          <div class="future-card">
+            <h3>Limitations and Extensions</h3>
+            <p>
+              MIND-Grasp may be misled when multiple hidden regions are plausible, and its retreat analysis depends on the quality of amodal 3D hypotheses. Future work will maintain uncertainty-aware multi-hypothesis beliefs, improve closed-loop RGB-D correction, and extend parallel-gripper grasp-remove to richer primitives such as pushing, dragging, opening, and dexterous-hand manipulation.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <div class="footer-note">
+        Additional materials will be released upon acceptance.
+      </div>
+    </main>
+  </div>
+
+  <script>
+
+
+    function playAllPageVideos() {
+      const videos = document.querySelectorAll("video:not([data-manual-playback='true'])");
+      videos.forEach(video => {
+        video.muted = true;
+        video.defaultMuted = true;
+        video.loop = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.setAttribute("muted", "");
+        video.setAttribute("defaultMuted", "");
+        video.setAttribute("autoplay", "");
+        video.setAttribute("loop", "");
+        video.setAttribute("playsinline", "");
+        video.setAttribute("webkit-playsinline", "");
+        video.preload = "auto";
+        const playbackRate = parseFloat(video.dataset.playbackRate || "1");
+        if (Number.isFinite(playbackRate) && playbackRate > 0) {
+          video.defaultPlaybackRate = playbackRate;
+          video.playbackRate = playbackRate;
+        }
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {
+            // Browsers may delay hidden videos; they will be retried on tab/scene changes.
+          });
+        }
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", playAllPageVideos);
+    window.addEventListener("load", playAllPageVideos);
+    window.addEventListener("pageshow", playAllPageVideos);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) playAllPageVideos();
+    });
+
+    const sceneTabs = document.querySelectorAll(".scene-tab");
+    const sceneStageContents = document.querySelectorAll(".scene-stage-content");
+
+    function activateResultScene(sceneId) {
+      sceneTabs.forEach(tab => {
+        const isActive = tab.dataset.scene === sceneId;
+        tab.classList.toggle("active", isActive);
+        tab.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+
+      sceneStageContents.forEach(panel => {
+        panel.classList.toggle("active", panel.dataset.scene === sceneId);
+      });
+
+      window.setTimeout(playAllPageVideos, 60);
+    }
+
+    sceneTabs.forEach(tab => {
+      tab.setAttribute("aria-pressed", tab.classList.contains("active") ? "true" : "false");
+      tab.addEventListener("click", () => {
+        activateResultScene(tab.dataset.scene);
+      });
+    });
+
+    activateResultScene("scene-1");
+
+    const analysisCaseTabs = document.querySelectorAll(".analysis-case-tab");
+    const analysisStageContents = document.querySelectorAll(".analysis-stage-content");
+
+    function activateAnalysisCase(groupId, caseId) {
+      analysisCaseTabs.forEach(tab => {
+        if (tab.dataset.analysisGroup !== groupId) return;
+        const isActive = tab.dataset.case === caseId;
+        tab.classList.toggle("active", isActive);
+        tab.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+
+      analysisStageContents.forEach(panel => {
+        if (panel.dataset.analysisGroup !== groupId) return;
+        panel.classList.toggle("active", panel.dataset.case === caseId);
+      });
+
+      window.setTimeout(playAllPageVideos, 60);
+    }
+
+    analysisCaseTabs.forEach(tab => {
+      tab.setAttribute("aria-pressed", tab.classList.contains("active") ? "true" : "false");
+      tab.addEventListener("click", () => {
+        activateAnalysisCase(tab.dataset.analysisGroup, tab.dataset.case);
+      });
+    });
+
+    activateAnalysisCase("reconstruction", "case-1");
+    activateAnalysisCase("nbv", "case-1");
+    playAllPageVideos();
+
+    const observedSections = [
+      "introduction-overview",
+      "introduction-video",
+      "method-reconstruction",
+      "method-retraction",
+      "results-visual",
+      "results-full",
+      "analysis-reconstruction",
+      "analysis-nbv",
+      "analysis-retraction",
+      "analysis-discovery",
+      "future-failure",
+      "future-limitations"
+    ];
+
+    const navMainItems = document.querySelectorAll(".nav-main");
+    const navSubItems = document.querySelectorAll(".nav-sub");
+
+    function setActive(sectionId, group) {
+      navMainItems.forEach(item => {
+        item.classList.toggle("active", item.dataset.group === group);
+      });
+      navSubItems.forEach(item => {
+        item.classList.toggle("active", item.dataset.target === sectionId);
+      });
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setActive(entry.target.id, entry.target.dataset.group);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "-35% 0px -55% 0px",
+        threshold: 0
+      }
+    );
+
+    observedSections.forEach(id => {
+      const section = document.getElementById(id);
+      if (section) observer.observe(section);
+    });
+  </script>
+</body>
+</html>
