@@ -10,6 +10,42 @@
     box-sizing:border-box
 }
 
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const videos = document.querySelectorAll("video");
+
+    videos.forEach(video => {
+
+        // 自动播放所需
+        video.muted = true;
+        video.autoplay = true;
+        video.loop = true;
+        video.playsInline = true;
+
+        // 默认 2 倍速
+        video.defaultPlaybackRate = 2.0;
+
+        video.addEventListener("loadedmetadata", function () {
+            video.playbackRate = 2.0;
+
+            video.play().catch(function(error) {
+                console.log("Autoplay prevented:", error);
+            });
+        });
+
+        // 每次重新播放时确保仍然是 2 倍速
+        video.addEventListener("play", function () {
+            video.playbackRate = 2.0;
+        });
+
+    });
+
+});
+</script>
+
+    
 body{
     margin:0;
     min-height:100vh;
