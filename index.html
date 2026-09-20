@@ -3,139 +3,633 @@
 <head>
 <meta charset="UTF-8">
 <title>Explore2Grasp</title>
+
 <style>
-*{box-sizing:border-box}
+
+*{
+    box-sizing:border-box
+}
+
 body{
     margin:0;
     min-height:100vh;
     font-family:Arial,Helvetica,sans-serif;
     color:#17324d;
+
     background:
       radial-gradient(circle at 15% 20%,rgba(180,225,255,.85),transparent 35%),
       radial-gradient(circle at 85% 15%,rgba(220,195,255,.75),transparent 35%),
       radial-gradient(circle at 55% 90%,rgba(255,205,225,.75),transparent 40%),
       linear-gradient(120deg,#dff4ff,#eadcff,#ffe6ef);
+
     background-size:180% 180%;
     animation:bgmove 20s ease infinite;
 }
+
+
 @keyframes bgmove{
     0%{background-position:0% 50%}
     50%{background-position:100% 50%}
     100%{background-position:0% 50%}
 }
+
+
 .container{
+
     width:75%;
     min-width:1000px;
     margin:0 auto;
     padding-top:35px;
     text-align:center;
+
 }
+
+
 .logos{
+
     width:100%;
     display:flex;
     align-items:center;
     justify-content:space-between;
     margin-bottom:35px;
+
 }
+
+
 .logo-left{
     width:330px;
 }
+
+
 .logo-right{
+
     display:flex;
     align-items:center;
     gap:35px;
+
 }
+
+
 .logo-right img{
+
     height:65px;
     width:auto;
+
 }
+
+
 h1{
+
     margin:0;
     font-size:64px;
     font-weight:800;
-    letter-spacing:-1px;
+
 }
+
+
 .subtitle{
+
     margin-top:15px;
     font-size:32px;
     font-weight:600;
     line-height:1.25;
     color:#42658d;
+
 }
+
+
 .anonymous{
+
     margin-top:22px;
     font-size:22px;
     font-weight:700;
+
 }
-.teaser-title{
-    margin-top:35px;
-    font-size:32px;
-    font-weight:700;
+
+
+.section-title{
+
+    margin-top:55px;
+    margin-bottom:20px;
+
+    font-size:34px;
+    font-weight:800;
+
+    color:#17324d;
+
 }
+
+
+.description{
+
+    width:92%;
+    margin:20px auto 40px;
+
+    font-size:20px;
+    line-height:1.7;
+
+    color:#355875;
+
+}
+
+
 .teaser{
+
     width:100%;
-    margin-top:15px;
+    margin-top:35px;
+
 }
+
+.video-grid-six{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:20px;
+
+    margin-top:25px;
+
+}
+    
+
+.video-grid-six video{
+
+    width:100%;
+
+    border-radius:12px;
+
+    background:#000;
+
+}
+
+
 .teaser img{
+
     width:100%;
     display:block;
+
 }
+
+
+
+/* svg image */
+
+.figure-box{
+
+    width:100%;
+    margin-top:20px;
+
+}
+
+
+.figure-box img{
+
+    width:100%;
+    display:block;
+
+}
+
+
+
+/* experiment image */
+
+
+.exp-image{
+
+    width:100%;
+    margin-top:20px;
+
+}
+
+
+.exp-image img{
+
+    width:100%;
+
+}
+
+
+
+
+/* video */
+
+
+.video-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:18px;
+
+    margin-top:25px;
+
+}
+
+
+
+.video-grid video{
+
+    width:100%;
+
+    border-radius:12px;
+
+    background:#000;
+
+}
+
+
+
+.video-title{
+
+    margin-top:50px;
+
+    font-size:28px;
+
+    font-weight:750;
+
+}
+
+
+
+
 
 .supplement{
-    margin-top:35px;
+
+    margin-top:60px;
+
     padding-bottom:40px;
+
     text-align:center;
+
     font-size:18px;
+
     color:#355875;
+
 }
+
+
+
 .supplement h2{
+
     margin-bottom:10px;
+
     font-size:28px;
+
     color:#17324d;
+
 }
+
+
 .supplement p{
+
     margin:0 auto;
+
     line-height:1.7;
+
 }
+
+
 
 </style>
+
 </head>
+
+
 <body>
+
+
 <div class="container">
 
+
 <div class="logos">
-    <img class="logo-left" src="assets/icra2027.png">
-    <div class="logo-right">
-        <img src="assets/ieee-logo-black.webp">
-        <img src="assets/RAS.png">
-    </div>
+
+<img class="logo-left" src="assets/icra2027.png">
+
+
+<div class="logo-right">
+
+<img src="assets/ieee-logo-black.webp">
+
+<img src="assets/RAS.png">
+
 </div>
+
+</div>
+
+
 
 <h1>Explore2Grasp</h1>
 
+
 <div class="subtitle">
+
 Active 3D Reconstruction and Collision-Aware Exploration for Confined-Space Grasping
+
 </div>
+
 
 <div class="anonymous">
+
 Anonymous submission to ICRA 2027
+
 </div>
 
+
+
+
+<!-- teaser -->
 
 <div class="teaser">
-<img src="assets/teaser.png" alt="Explore2Grasp teaser">
+
+<img src="assets/teaser.png">
+
 </div>
+
+
+
+
+<!-- challenges -->
+
+
+<div class="section-title">
+
+Key Challenges
+
+</div>
+
+
+<div class="description">
+
+Confined-space manipulation requires robots to discover unseen targets, 
+navigate through constrained environments, react to unexpected dynamic changes,
+and generalize manipulation capability across diverse scenarios.
+
+</div>
+
+
+
+
+<!-- overview -->
+
+
+<div class="section-title">
+
+Explore2Grasp Overview
+
+</div>
+
+
+<div class="figure-box">
+
+<img src="assets/overview.svg">
+
+</div>
+
+
+<div class="description">
+
+Explore2Grasp combines global scene perception and local eye-in-hand observations 
+to progressively reconstruct unseen 3D structures and hidden target objects.
+Conditioned on language instructions, scene features, and robot states, 
+the Action Generator predicts informative exploration actions through cross-view attention.
+A Diffuser model estimates obstacle-aware grasp poses for reliable manipulation execution.
+
+</div>
+
+
+
+
+
+<!-- benchmark -->
+
+
+<div class="section-title">
+
+E2GBench
+
+</div>
+
+
+<div class="figure-box">
+
+<img src="assets/e2gbench.svg">
+
+</div>
+
+
+<div class="description">
+
+E2GBench consists of five confined-space manipulation tasks.
+Partially Hidden (PH) considers targets with partial visibility requiring active exploration,
+Fully Hidden (FH) involves completely occluded targets requiring scene reconstruction,
+Constrained Workspace (CW) evaluates manipulation under severe geometric constraints,
+Sudden Obstacle (SO) measures robustness against unexpected obstacles,
+and Dynamic Obstacle (DO) evaluates reactive avoidance against moving obstacles.
+
+</div>
+
+
+
+
+
+<!-- experiments -->
+
+
+<div class="section-title">
+
+Experiments
+
+</div>
+
+
+
+
+
+<!-- simulation -->
+
+
+<div class="video-title">
+
+Confined-space exploration and grasping performance comparison in simulation
+
+</div>
+
+
+<div class="exp-image">
+
+<img src="assets/simulation.png">
+
+</div>
+
+
+
+
+<!-- reconstruction -->
+
+
+<div class="video-title">
+
+Comparison of multi-view 3D reconstruction results in confined-space scenarios
+
+</div>
+
+
+<div class="exp-image">
+
+<img src="assets/reconstruction.png">
+
+</div>
+
+
+
+
+
+
+<!-- real world -->
+
+
+<div class="section-title">
+
+Real-world Experiments
+
+</div>
+
+
+
+
+
+<div class="video-title">
+
+Experiment 1: Active exploration and grasping in confined spaces
+
+</div>
+
+
+<div class="video-grid-six">
+
+<video controls src="assets/video/exp1_1.mp4"></video>
+
+<video controls src="assets/video/exp1_2.mp4"></video>
+
+<video controls src="assets/video/exp1_3.mp4"></video>
+
+
+<video controls src="assets/video/exp1_4.mp4"></video>
+
+<video controls src="assets/video/exp1_5.mp4"></video>
+
+<video controls src="assets/video/exp1_6.mp4"></video>
+
+
+</div>
+
+
+
+
+<div class="video-title">
+
+Experiment 2: Dynamic obstacle avoidance
+
+</div>
+
+
+<div class="video-grid">
+
+<video controls src="assets/video/exp2_1.mp4"></video>
+<video controls src="assets/video/exp2_2.mp4"></video>
+<video controls src="assets/video/exp2_3.mp4"></video>
+<video controls src="assets/video/exp2_4.mp4"></video>
+
+</div>
+
+
+
+
+<div class="video-title">
+
+Experiment 3: Multi-view reconstruction and grasp refinement
+
+</div>
+
+
+<div class="video-grid">
+
+<video controls src="assets/video/exp3_1.mp4"></video>
+<video controls src="assets/video/exp3_2.mp4"></video>
+<video controls src="assets/video/exp3_3.mp4"></video>
+<video controls src="assets/video/exp3_4.mp4"></video>
+
+</div>
+
+
+
+
+
+<div class="video-title">
+
+Experiment 4: Generalization across confined-space scenarios
+
+</div>
+
+
+<div class="video-grid">
+
+<video controls src="assets/video/exp4_1.mp4"></video>
+<video controls src="assets/video/exp4_2.mp4"></video>
+<video controls src="assets/video/exp4_3.mp4"></video>
+<video controls src="assets/video/exp4_4.mp4"></video>
+
+</div>
+
+
+
+
+
+<div class="video-title">
+
+Experiment 5: Failure cases and limitation analysis
+
+</div>
+
+
+<div class="video-grid">
+
+<video controls src="assets/video/exp5_1.mp4"></video>
+<video controls src="assets/video/exp5_2.mp4"></video>
+<video controls src="assets/video/exp5_3.mp4"></video>
+<video controls src="assets/video/exp5_4.mp4"></video>
+
+</div>
+
+
+
 
 
 <div class="supplement">
-    <h2>More supplementary material</h2>
-    <p>
-        More supplementary material will be fully released on
-        <strong>September 22, 2026</strong>, corresponding to the
-        <strong>submission deadline for accompanying videos</strong>.
-    </p>
-</div>
+
+<h2>
+More supplementary material
+</h2>
+
+
+<p>
+
+More supplementary material will be fully released on
+<strong>September 22, 2026</strong>,
+corresponding to the
+<strong>submission deadline for accompanying videos</strong>.
+
+</p>
+
 
 </div>
+
+
+
+</div>
+
+
 </body>
 </html>
